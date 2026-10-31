@@ -12,4 +12,7 @@ describe("Contacto", () => {
     expect(() => new Contacto("Ana Pérez", "ana.ucp.edu.ar")).toThrow();
   });
 
+  it("no debe aceptar nombres vacíos", () => {
+    expect(() => new Contacto("", "ana@ucp.edu.ar")).toThrow();
+  });
 });

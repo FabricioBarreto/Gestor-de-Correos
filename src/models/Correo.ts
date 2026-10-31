@@ -1,6 +1,9 @@
 import { Contacto } from "./Contacto";
 
 export class Correo {
+  private leido = false;
+  private favorito = false;
+
   constructor(
     private remitente: Contacto,
     private asunto: string,
@@ -22,5 +25,13 @@ export class Correo {
 
   getDestinatarios(): Contacto[] {
     return this.destinatarios;
+  }
+
+  estaLeido(): boolean {
+    return this.leido;
+  }
+
+  esFavorito(): boolean {
+    return this.favorito;
   }
 }

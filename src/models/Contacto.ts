@@ -3,6 +3,10 @@ export class Contacto {
     private nombre: string,
     private email: string,
   ) {
+    if (nombre.trim() === "") {
+      throw new Error("El nombre no puede estar vacío");
+    }
+
     if (!Contacto.esEmailValido(email)) {
       throw new Error("Email inválido");
     }

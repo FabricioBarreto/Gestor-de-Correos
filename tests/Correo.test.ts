@@ -24,4 +24,23 @@ describe("Correo", () => {
     expect(correo.estaLeido()).toBe(false);
     expect(correo.esFavorito()).toBe(false);
   });
+
+  it("cada correo tiene un id único", () => {
+    const remitente1 = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const destinatario1 = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const remitente2 = new Contacto("Luis Gómez", "luis@gmail.com");
+    const destinatario2 = new Contacto("Marta Ruiz", "marta@hotmail.com");
+
+    const correo1 = new Correo(remitente1, "Asunto 1", "Cuerpo 1", [
+      destinatario1,
+    ]);
+    const correo2 = new Correo(remitente2, "Asunto 2", "Cuerpo 2", [
+      destinatario2,
+    ]);
+
+    expect(correo1.getId()).not.toBe(correo2.getId());
+    expect(correo1.getRemitente()).toBe(remitente1);
+    expect(correo2.getRemitente()).toBe(remitente2);
+    expect(correo2.getDestinatarios()).toEqual([destinatario2]);
+  });
 });

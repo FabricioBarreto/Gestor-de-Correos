@@ -32,7 +32,7 @@ export class Correo {
   }
 
   getDestinatarios(): Contacto[] {
-    return this.destinatarios;
+    return [...this.destinatarios];
   }
 
   estaLeido(): boolean {

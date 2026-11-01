@@ -43,4 +43,17 @@ describe("Correo", () => {
     expect(correo2.getRemitente()).toBe(remitente2);
     expect(correo2.getDestinatarios()).toEqual([destinatario2]);
   });
+
+  it("modificar la lista de destinatarios obtenida no altera el correo", () => {
+    const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const intruso = new Contacto("Luis Gómez", "luis@gmail.com");
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+
+    const lista = correo.getDestinatarios();
+    lista.push(intruso);
+
+    expect(correo.getDestinatarios()).toHaveLength(1);
+    expect(correo.getDestinatarios()).toEqual([destinatario]);
+  });
 });

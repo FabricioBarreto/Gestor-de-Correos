@@ -103,3 +103,29 @@ describe("GestorCorreos - validación al enviar", () => {
     expect(gestor.getCorreos(Bandeja.ENVIADOS)).toEqual([]);
   });
 });
+
+describe("GestorCorreos - duplicados al enviar", () => {
+  const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+  it("enviar dos veces el mismo correo no genera duplicados", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+
+    gestor.enviar(correo);
+    gestor.enviar(correo);
+
+    expect(gestor.getCorreos(Bandeja.ENVIADOS)).toHaveLength(1);
+  });
+
+  it("correos distintos con el mismo contenido se guardan por separado", () => {
+    const gestor = new GestorCorreos();
+    const correo1 = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    const correo2 = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+
+    gestor.enviar(correo1);
+    gestor.enviar(correo2);
+
+    expect(gestor.getCorreos(Bandeja.ENVIADOS)).toHaveLength(2);
+  });
+});

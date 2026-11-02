@@ -12,7 +12,12 @@ export class GestorCorreos {
   getCorreos(bandeja: Bandeja): Correo[] {
     return [...(this.bandejas.get(bandeja) ?? [])];
   }
-    enviar(correo: Correo): void {
+     enviar(correo: Correo): void {
+    if (!correo.puedeEnviarse()) {
+      throw new Error(
+        "El correo no puede enviarse: requiere remitente, asunto y al menos un destinatario",
+      );
+    }
     this.bandejas.get(Bandeja.ENVIADOS)!.push(correo);
   }
 }

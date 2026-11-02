@@ -69,3 +69,37 @@ describe("GestorCorreos - envío", () => {
     expect(gestor.getCorreos(Bandeja.ELIMINADOS)).toEqual([]);
   });
 });
+
+describe("GestorCorreos - validación al enviar", () => {
+  const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+  it("no permite enviar un correo sin destinatarios", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", []);
+
+    expect(() => gestor.enviar(correo)).toThrow();
+  });
+
+  it("no permite enviar un correo con asunto vacío o en blanco", () => {
+    const gestor = new GestorCorreos();
+    const vacio = new Correo(remitente, "", "Cuerpo", [destinatario]);
+    const blanco = new Correo(remitente, "   ", "Cuerpo", [destinatario]);
+
+    expect(() => gestor.enviar(vacio)).toThrow();
+    expect(() => gestor.enviar(blanco)).toThrow();
+  });
+
+  it("un correo inválido no queda guardado en Enviados", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", []);
+
+    try {
+      gestor.enviar(correo);
+    } catch {
+      // se espera el error
+    }
+
+    expect(gestor.getCorreos(Bandeja.ENVIADOS)).toEqual([]);
+  });
+});

@@ -1,4 +1,6 @@
 import {describe, it, expect} from 'vitest';
+import { Agenda } from '../src/services/Agenda';
+import { Contacto } from '../src/models/Contacto';
 
 describe('Agenda', () => {
   it("se puede agregar un contacto y buscarlo por email", () => {

@@ -12,4 +12,7 @@ export class GestorCorreos {
   getCorreos(bandeja: Bandeja): Correo[] {
     return [...(this.bandejas.get(bandeja) ?? [])];
   }
+    enviar(correo: Correo): void {
+    this.bandejas.get(Bandeja.ENVIADOS)!.push(correo);
+  }
 }

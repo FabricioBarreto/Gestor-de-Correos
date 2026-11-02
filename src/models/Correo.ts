@@ -42,4 +42,12 @@ export class Correo {
   esFavorito(): boolean {
     return this.favorito;
   }
+
+  puedeEnviarse(): boolean {
+    return (
+      this.remitente !== undefined &&
+      this.asunto.trim() !== "" &&
+      this.destinatarios.length > 0
+    );
+  }
 }

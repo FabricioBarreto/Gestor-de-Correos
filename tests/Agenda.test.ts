@@ -42,4 +42,22 @@ describe("Agenda", () => {
       "Contacto no encontrado",
     );
   });
+
+  it("se puede eliminar un contacto", () => {
+    const agenda = new Agenda();
+    const contacto = new Contacto("Juan", "juan@example.com");
+
+    agenda.agregarContacto(contacto);
+    agenda.eliminarContacto("juan@example.com");
+
+    expect(agenda.buscarContactoPorEmail("juan@example.com")).toBeUndefined();
+  });
+
+  it("no se puede eliminar un contacto que no existe", () => {
+    const agenda = new Agenda();
+
+    expect(() => agenda.eliminarContacto("nadie@example.com")).toThrow(
+      "Contacto no encontrado",
+    );
+  });
 });

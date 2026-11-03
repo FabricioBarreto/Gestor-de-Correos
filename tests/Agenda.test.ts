@@ -1,6 +1,9 @@
 import { describe, it, expect } from "vitest";
 import { Agenda } from "../src/services/Agenda";
 import { Contacto } from "../src/models/Contacto";
+import { Bandeja } from "../src/models/Bandeja";
+import { Correo } from "../src/models/Correo";
+import { GestorCorreos } from "../src/services/GestorCorreos";
 
 describe("Agenda", () => {
   it("se puede agregar un contacto y buscarlo por email", () => {
@@ -60,4 +63,20 @@ describe("Agenda", () => {
       "Contacto no encontrado",
     );
   });
+
+  it("eliminar un contacto no elimina los correos que lo referencian", () => {
+    const agenda = new Agenda();
+    const gestor = new GestorCorreos();
+    const juan = new Contacto("Juan", "juan@example.com");
+    const ana = new Contacto("Ana", "ana@example.com");
+    agenda.agregarContacto(juan);
+    const correo = new Correo(juan, "Asunto", "Cuerpo", [ana]);
+    gestor.enviar(correo);
+
+    agenda.eliminarContacto("juan@example.com");
+
+    expect(gestor.getCorreos(Bandeja.ENVIADOS)).toHaveLength(1);
+    expect(correo.getRemitente().getNombre()).toBe("Juan");
+  });
 });
+

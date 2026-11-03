@@ -13,4 +13,12 @@ export class Agenda {
   buscarContactoPorEmail(email: string): Contacto | undefined {
     return this.contactos.get(email);
   }
+
+  modificarContacto(email: string, nuevoNombre: string): void {
+    const contacto = this.contactos.get(email);
+    if (!contacto) {
+      throw new Error("Contacto no encontrado");
+    }
+    contacto.setNombre(nuevoNombre);
+  }
 }

@@ -21,4 +21,11 @@ export class Agenda {
     }
     contacto.setNombre(nuevoNombre);
   }
+
+  eliminarContacto(email: string): void {
+    if (!this.contactos.delete(email)) {
+      throw new Error("Contacto no encontrado");
+    }
+  }
+
 }

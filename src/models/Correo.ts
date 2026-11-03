@@ -13,6 +13,7 @@ export class Correo {
     private destinatarios: Contacto[],
   ) {
     this.id = Correo.siguienteId++;
+    this.destinatarios = [...destinatarios];
   }
 
   getId(): number {

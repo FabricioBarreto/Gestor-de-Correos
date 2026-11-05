@@ -129,3 +129,38 @@ describe("GestorCorreos - duplicados al enviar", () => {
     expect(gestor.getCorreos(Bandeja.ENVIADOS)).toHaveLength(2);
   });
 });
+
+describe("GestorCorreos - recepción", () => {
+  const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+  it("un correo recibido queda en la bandeja de Entrada", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+
+    gestor.recibir(correo);
+
+    expect(gestor.getCorreos(Bandeja.ENTRADA)).toEqual([correo]);
+  });
+
+  it("recibir un correo no lo agrega a otras bandejas", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+
+    gestor.recibir(correo);
+
+    expect(gestor.getCorreos(Bandeja.ENVIADOS)).toEqual([]);
+    expect(gestor.getCorreos(Bandeja.BORRADORES)).toEqual([]);
+    expect(gestor.getCorreos(Bandeja.ELIMINADOS)).toEqual([]);
+  });
+
+  it("recibir dos veces el mismo correo no genera duplicados", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+
+    gestor.recibir(correo);
+    gestor.recibir(correo);
+
+    expect(gestor.getCorreos(Bandeja.ENTRADA)).toHaveLength(1);
+  });
+});

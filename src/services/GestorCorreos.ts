@@ -26,4 +26,13 @@ export class GestorCorreos {
       enviados.push(correo);
     }
   }
+
+    recibir(correo: Correo): void {
+    const entrada = this.bandejas.get(Bandeja.ENTRADA)!;
+    const yaRecibido = entrada.some((c) => c.getId() === correo.getId());
+
+    if (!yaRecibido) {
+      entrada.push(correo);
+    }
+  }
 }

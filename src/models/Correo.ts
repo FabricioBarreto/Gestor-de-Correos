@@ -51,4 +51,13 @@ export class Correo {
       this.destinatarios.length > 0
     );
   }
+
+  coincideCon(texto: string): boolean {
+    const buscado = texto.toLowerCase();
+
+    return (
+      this.asunto.toLowerCase().includes(buscado) ||
+      this.cuerpo.toLowerCase().includes(buscado)
+    );
+  }
 }

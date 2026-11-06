@@ -36,9 +36,15 @@ export class GestorCorreos {
     }
   }
    
-  buscar(texto: string): Correo[] {
+ buscar(texto: string): Correo[] {
+    const buscado = texto.trim();
+
+    if (buscado === "") {
+      return [];
+    }
+
     return this.getCorreos(Bandeja.ENTRADA).filter((correo) =>
-      correo.coincideCon(texto),
+      correo.coincideCon(buscado),
     );
-  } 
+  }
 }

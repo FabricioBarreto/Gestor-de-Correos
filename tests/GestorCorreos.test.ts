@@ -208,3 +208,29 @@ describe("GestorCorreos - búsqueda", () => {
     expect(gestor.buscar("examen")).toEqual([]);
   });
 });
+
+describe("GestorCorreos - búsqueda con texto vacío y sin efectos", () => {
+  const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const ana = new Contacto("Ana Pérez", "ana@gmail.com");
+
+  it("un texto vacío o en blanco no devuelve resultados", () => {
+    const gestor = new GestorCorreos();
+    gestor.recibir(new Correo(juan, "Asunto", "Cuerpo", [ana]));
+
+    expect(gestor.buscar("")).toEqual([]);
+    expect(gestor.buscar("   ")).toEqual([]);
+  });
+
+  it("buscar no modifica los correos ni la bandeja de Entrada", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(juan, "Examen", "Cuerpo", [ana]);
+    gestor.recibir(correo);
+
+    gestor.buscar("examen");
+
+    expect(gestor.getCorreos(Bandeja.ENTRADA)).toEqual([correo]);
+    expect(correo.getAsunto()).toBe("Examen");
+    expect(correo.estaLeido()).toBe(false);
+    expect(correo.esFavorito()).toBe(false);
+  });
+});

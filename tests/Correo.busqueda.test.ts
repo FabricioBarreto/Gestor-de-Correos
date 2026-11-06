@@ -41,3 +41,24 @@ describe("Correo - coincidencia con texto", () => {
     expect(correo.coincideCon("inexistente")).toBe(false);
   });
 });
+
+describe("Correo - coincidencia con remitente y destinatarios", () => {
+  const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const ana = new Contacto("Ana Pérez", "ana@gmail.com");
+  const luis = new Contacto("Luis Gómez", "luis@hotmail.com");
+  const correo = new Correo(remitente, "Asunto", "Cuerpo", [ana, luis]);
+
+  it("coincide con el nombre o el email del remitente", () => {
+    expect(correo.coincideCon("garcía")).toBe(true);
+    expect(correo.coincideCon("@UCP.edu")).toBe(true);
+  });
+
+  it("coincide con el nombre o el email de cualquiera de los destinatarios", () => {
+    expect(correo.coincideCon("ana pér")).toBe(true);
+    expect(correo.coincideCon("hotmail")).toBe(true);
+  });
+
+  it("no coincide con personas que no participan del correo", () => {
+    expect(correo.coincideCon("marta")).toBe(false);
+  });
+});

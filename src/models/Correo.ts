@@ -54,10 +54,14 @@ export class Correo {
 
   coincideCon(texto: string): boolean {
     const buscado = texto.toLowerCase();
+    const contactos = [this.remitente, ...this.destinatarios];
 
-    return (
-      this.asunto.toLowerCase().includes(buscado) ||
-      this.cuerpo.toLowerCase().includes(buscado)
-    );
+    const camposDeTexto = [
+      this.asunto,
+      this.cuerpo,
+      ...contactos.flatMap((c) => [c.getNombre(), c.getEmail()]),
+    ];
+
+    return camposDeTexto.some((campo) => campo.toLowerCase().includes(buscado));
   }
 }

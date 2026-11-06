@@ -35,4 +35,10 @@ export class GestorCorreos {
       entrada.push(correo);
     }
   }
+   
+  buscar(texto: string): Correo[] {
+    return this.getCorreos(Bandeja.ENTRADA).filter((correo) =>
+      correo.coincideCon(texto),
+    );
+  } 
 }

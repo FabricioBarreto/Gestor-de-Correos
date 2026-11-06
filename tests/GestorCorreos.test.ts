@@ -164,3 +164,47 @@ describe("GestorCorreos - recepción", () => {
     expect(gestor.getCorreos(Bandeja.ENTRADA)).toHaveLength(1);
   });
 });
+
+describe("GestorCorreos - búsqueda", () => {
+  const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const ana = new Contacto("Ana Pérez", "ana@gmail.com");
+
+  it("encuentra los correos de la Entrada que coinciden con el texto", () => {
+    const gestor = new GestorCorreos();
+    const examen = new Correo(juan, "Examen Final", "Cuerpo", [ana]);
+    const otro = new Correo(juan, "Saludos", "Cuerpo", [ana]);
+    gestor.recibir(examen);
+    gestor.recibir(otro);
+
+    expect(gestor.buscar("examen")).toEqual([examen]);
+  });
+
+  it("un correo aparece una sola vez aunque coincida con varios campos", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(juan, "Proyecto", "Proyecto de Juan", [ana]);
+    gestor.recibir(correo);
+
+    expect(gestor.buscar("proyecto")).toHaveLength(1);
+    expect(gestor.buscar("juan")).toHaveLength(1);
+  });
+
+  it("devuelve una colección vacía cuando no hay coincidencias", () => {
+    const gestor = new GestorCorreos();
+    gestor.recibir(new Correo(juan, "Asunto", "Cuerpo", [ana]));
+
+    expect(gestor.buscar("inexistente")).toEqual([]);
+  });
+
+  it("devuelve una colección vacía si la bandeja de Entrada está vacía", () => {
+    const gestor = new GestorCorreos();
+
+    expect(gestor.buscar("algo")).toEqual([]);
+  });
+
+  it("solo busca en la Entrada, no en otras bandejas", () => {
+    const gestor = new GestorCorreos();
+    gestor.enviar(new Correo(juan, "Examen", "Cuerpo", [ana]));
+
+    expect(gestor.buscar("examen")).toEqual([]);
+  });
+});

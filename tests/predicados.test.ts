@@ -7,6 +7,7 @@ import {
   noLeido,
   favorito,
   and,
+  or,
 } from "../src/funcional/predicados";
 
 describe("Predicados", () => {
@@ -64,9 +65,22 @@ describe("Predicados", () => {
     const academico = and(deDominio("@ucp.edu.ar"), asuntoContiene("examen"));
 
     expect(academico(ucpExamen)).toBe(true);
-
-    expect(academico(ucpExamen)).toBe(true);
     expect(academico(ucpSaludos)).toBe(false);
     expect(academico(gmailExamen)).toBe(false);
+  });
+
+  it("or combina dos predicados: se cumple al menos uno", () => {
+    const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+    const finalExamen = new Correo(juan, "Examen Final", "Cuerpo", [ana]);
+    const reunion = new Correo(juan, "Reunión de equipo", "Cuerpo", [ana]);
+    const saludo = new Correo(juan, "Saludos", "Cuerpo", [ana]);
+
+    const importante = or(asuntoContiene("examen"), asuntoContiene("reunión"));
+
+    expect(importante(finalExamen)).toBe(true);
+    expect(importante(reunion)).toBe(true);
+    expect(importante(saludo)).toBe(false);
   });
 });

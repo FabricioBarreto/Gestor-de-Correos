@@ -25,3 +25,8 @@ export const or =
   (p1: Predicado, p2: Predicado): Predicado =>
   (correo) =>
     p1(correo) || p2(correo);
+
+export const not =
+  (p: Predicado): Predicado =>
+  (correo) =>
+    !p(correo);

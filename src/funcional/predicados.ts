@@ -15,3 +15,8 @@ export const asuntoContiene =
 export const noLeido: Predicado = (correo) => !correo.estaLeido();
 
 export const favorito: Predicado = (correo) => correo.esFavorito();
+
+export const and =
+  (p1: Predicado, p2: Predicado): Predicado =>
+  (correo) =>
+    p1(correo) && p2(correo);

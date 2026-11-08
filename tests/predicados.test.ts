@@ -6,6 +6,7 @@ import {
   asuntoContiene,
   noLeido,
   favorito,
+  and,
 } from "../src/funcional/predicados";
 
 describe("Predicados", () => {
@@ -48,5 +49,24 @@ describe("Predicados", () => {
     const correo = new Correo(juan, "Asunto", "Cuerpo", [ana]);
 
     expect(favorito(correo)).toBe(false);
+  });
+
+  it("and combina dos predicados: se cumplen ambos", () => {
+    const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const ana = new Contacto("Ana Pérez", "ana@gmail.com");
+    const luis = new Contacto("Luis Gómez", "luis@gmail.com");
+
+    const ucpExamen = new Correo(juan, "Examen Final", "Cuerpo", [ana]);
+    const ucpSaludos = new Correo(juan, "Saludos", "Cuerpo", [ana]);
+
+    const gmailExamen = new Correo(luis, "Examen Final", "Cuerpo", [ana]);
+
+    const academico = and(deDominio("@ucp.edu.ar"), asuntoContiene("examen"));
+
+    expect(academico(ucpExamen)).toBe(true);
+
+    expect(academico(ucpExamen)).toBe(true);
+    expect(academico(ucpSaludos)).toBe(false);
+    expect(academico(gmailExamen)).toBe(false);
   });
 });

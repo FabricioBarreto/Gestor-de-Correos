@@ -1,6 +1,7 @@
 import { Bandeja } from "../models/Bandeja";
 import { Correo } from "../models/Correo";
 import { ReglaCorreo } from "../funcional/ReglaCorreo";
+import { Contacto } from "../models/Contacto";
 
 export class GestorCorreos {
   private static readonly MAX_FILTROS = 5;
@@ -44,9 +45,22 @@ export class GestorCorreos {
   recibir(correo: Correo): void {
     this.agregarSinDuplicar(Bandeja.ENTRADA, correo);
   }
-  
+
   guardarBorrador(correo: Correo): void {
     this.agregarSinDuplicar(Bandeja.BORRADORES, correo);
+  }
+
+  editarBorrador(
+    correo: Correo,
+    cambios: { asunto?: string; cuerpo?: string; destinatarios?: Contacto[] },
+  ): void {
+    if (this.getBandejaDe(correo) !== Bandeja.BORRADORES) {
+      throw new Error("Solo se pueden editar borradores");
+    }
+
+    correo.setAsunto(cambios.asunto ?? correo.getAsunto());
+    correo.setCuerpo(cambios.cuerpo ?? correo.getCuerpo());
+    correo.setDestinatarios(cambios.destinatarios ?? correo.getDestinatarios());
   }
 
   getBandejaDe(correo: Correo): Bandeja | undefined {
@@ -55,7 +69,7 @@ export class GestorCorreos {
     );
     return ubicacion?.[0];
   }
-  
+
   eliminar(correo: Correo): void {
     const actual = this.getBandejaDe(correo);
 
@@ -87,10 +101,12 @@ export class GestorCorreos {
       this.enviar(correo);
     }
   }
-  
+
   restaurar(correo: Correo): void {
     if (this.getBandejaDe(correo) !== Bandeja.ELIMINADOS) {
-      throw new Error("Solo se pueden restaurar correos que están en Eliminados");
+      throw new Error(
+        "Solo se pueden restaurar correos que están en Eliminados",
+      );
     }
 
     const origen = this.origenes.get(correo.getId())!;

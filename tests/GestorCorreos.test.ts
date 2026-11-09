@@ -384,3 +384,61 @@ describe("GestorCorreos - una única bandeja por correo", () => {
     expect(gestor.getCorreos(Bandeja.ENVIADOS)).toEqual([]);
   });
 });
+
+describe("GestorCorreos - eliminación lógica", () => {
+  const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+  it("eliminar un correo de la Entrada lo traslada a Eliminados", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.recibir(correo);
+
+    gestor.eliminar(correo);
+
+    expect(gestor.getCorreos(Bandeja.ENTRADA)).toEqual([]);
+    expect(gestor.getCorreos(Bandeja.ELIMINADOS)).toEqual([correo]);
+  });
+
+  it("se pueden eliminar correos de Enviados y de Borradores", () => {
+    const gestor = new GestorCorreos();
+    const enviado = new Correo(remitente, "Uno", "Cuerpo", [destinatario]);
+    const borrador = new Correo(remitente, "Dos", "Cuerpo", []);
+    gestor.enviar(enviado);
+    gestor.guardarBorrador(borrador);
+
+    gestor.eliminar(enviado);
+    gestor.eliminar(borrador);
+
+    expect(gestor.getCorreos(Bandeja.ENVIADOS)).toEqual([]);
+    expect(gestor.getCorreos(Bandeja.BORRADORES)).toEqual([]);
+    expect(gestor.getCorreos(Bandeja.ELIMINADOS)).toHaveLength(2);
+  });
+
+  it("eliminar es lógico: el correo conserva su información", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.recibir(correo);
+
+    gestor.eliminar(correo);
+
+    expect(gestor.getCorreos(Bandeja.ELIMINADOS)[0].getAsunto()).toBe("Asunto");
+  });
+
+  it("no permite eliminar un correo que no está en ninguna bandeja", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+
+    expect(() => gestor.eliminar(correo)).toThrow();
+  });
+
+  it("no permite eliminar dos veces el mismo correo", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.recibir(correo);
+    gestor.eliminar(correo);
+
+    expect(() => gestor.eliminar(correo)).toThrow();
+    expect(gestor.getCorreos(Bandeja.ELIMINADOS)).toHaveLength(1);
+  });
+});

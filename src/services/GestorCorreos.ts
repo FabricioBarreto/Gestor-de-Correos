@@ -5,7 +5,7 @@ import { ReglaCorreo } from "../funcional/ReglaCorreo";
 export class GestorCorreos {
   private static readonly MAX_FILTROS = 5;
   private filtros: ReglaCorreo[] = [];
-
+  private origenes = new Map<number, Bandeja>();
   private bandejas: Map<Bandeja, Correo[]> = new Map([
     [Bandeja.ENTRADA, []],
     [Bandeja.ENVIADOS, []],
@@ -50,6 +50,21 @@ export class GestorCorreos {
     return ubicacion?.[0];
   }
   
+  eliminar(correo: Correo): void {
+    const actual = this.getBandejaDe(correo);
+
+    if (actual === undefined) {
+      throw new Error("El correo no está en ninguna bandeja");
+    }
+    if (actual === Bandeja.ELIMINADOS) {
+      throw new Error("El correo ya está en Eliminados");
+    }
+
+    this.quitar(correo);
+    this.origenes.set(correo.getId(), actual);
+    this.bandejas.get(Bandeja.ELIMINADOS)!.push(correo);
+  }
+
   buscar(texto: string): Correo[] {
     const buscado = texto.trim();
 

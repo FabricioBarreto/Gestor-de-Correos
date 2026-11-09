@@ -69,4 +69,18 @@ describe("Correo", () => {
     expect(correo.getDestinatarios()).toHaveLength(1);
     expect(correo.getDestinatarios()).toEqual([destinatario]);
   });
+
+  it("permite modificar el asunto y el cuerpo", () => {
+    const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const correo = new Correo(remitente, "Borrador", "Texto inicial", [
+      destinatario,
+    ]);
+
+    correo.setAsunto("Examen Final");
+    correo.setCuerpo("Texto corregido");
+
+    expect(correo.getAsunto()).toBe("Examen Final");
+    expect(correo.getCuerpo()).toBe("Texto corregido");
+  });
 });

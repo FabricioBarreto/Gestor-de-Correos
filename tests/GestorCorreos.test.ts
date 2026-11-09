@@ -241,7 +241,7 @@ describe("GestorCorreos - filtros", () => {
   it("se pueden registrar filtros y consultarlos", () => {
     const gestor = new GestorCorreos();
     const filtro = new Filtro("Exámenes", asuntoContiene("examen"));
-    
+
     gestor.registrarFiltro(filtro);
 
     expect(gestor.getFiltros()).toEqual([filtro]);
@@ -257,7 +257,30 @@ describe("GestorCorreos - filtros", () => {
 
     const sextoFiltro = new Filtro("Sexto filtro", asuntoContiene("test"));
     expect(() => gestor.registrarFiltro(sextoFiltro)).toThrow(
-      "No se pueden registrar más de 5 filtros"
+      "No se pueden registrar más de 5 filtros",
+    );
+  });
+
+  it("aplica un filtro registrado sobre una bandeja", () => {
+    const gestor = new GestorCorreos();
+    const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const examen = new Correo(juan, "Examen Final", "Cuerpo", [ana]);
+    const saludos = new Correo(juan, "Saludos", "Cuerpo", [ana]);
+    gestor.recibir(examen);
+    gestor.recibir(saludos);
+    gestor.registrarFiltro(new Filtro("Exámenes", asuntoContiene("examen")));
+
+    const resultado = gestor.aplicarFiltro("Exámenes", Bandeja.ENTRADA);
+
+    expect(resultado).toEqual([examen]);
+  });
+
+  it("no se puede aplicar un filtro que no está registrado", () => {
+    const gestor = new GestorCorreos();
+
+    expect(() => gestor.aplicarFiltro("Inexistente", Bandeja.ENTRADA)).toThrow(
+      "Filtro no encontrado",
     );
   });
 });

@@ -54,6 +54,16 @@ export class GestorCorreos {
     this.filtros.push(regla);
   }
 
+  aplicarFiltro(nombre: string, bandeja: Bandeja): Correo[] {
+    const regla = this.filtros.find((r) => r.getNombre() === nombre);
+
+    if (!regla) {
+      throw new Error("Filtro no encontrado");
+    }
+
+    return this.getCorreos(bandeja).filter((c) => regla.cumple(c));
+  }
+
   private agregarSinDuplicar(bandeja: Bandeja, correo: Correo): void {
     const correos = this.bandejas.get(bandeja)!;
     const yaExiste = correos.some((c) => c.getId() === correo.getId());

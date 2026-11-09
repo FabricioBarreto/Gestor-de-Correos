@@ -501,3 +501,78 @@ describe("GestorCorreos - restauración", () => {
     expect(() => gestor.restaurar(correo)).toThrow();
   });
 });
+
+describe("GestorCorreos - movimientos permitidos", () => {
+  const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+  it("mover un borrador válido a Enviados lo envía", () => {
+    const gestor = new GestorCorreos();
+    const borrador = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.guardarBorrador(borrador);
+
+    gestor.mover(borrador, Bandeja.ENVIADOS);
+
+    expect(gestor.getBandejaDe(borrador)).toBe(Bandeja.ENVIADOS);
+    expect(gestor.getCorreos(Bandeja.BORRADORES)).toEqual([]);
+  });
+
+  it("mover un borrador inválido a Enviados falla y no lo mueve", () => {
+    const gestor = new GestorCorreos();
+    const borrador = new Correo(remitente, "", "Cuerpo", []);
+    gestor.guardarBorrador(borrador);
+
+    expect(() => gestor.mover(borrador, Bandeja.ENVIADOS)).toThrow();
+    expect(gestor.getBandejaDe(borrador)).toBe(Bandeja.BORRADORES);
+  });
+
+  it("mover a Eliminados equivale a eliminar", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.recibir(correo);
+
+    gestor.mover(correo, Bandeja.ELIMINADOS);
+
+    expect(gestor.getBandejaDe(correo)).toBe(Bandeja.ELIMINADOS);
+  });
+
+  it("rechaza movimientos que no respetan las reglas del dominio", () => {
+    const gestor = new GestorCorreos();
+    const recibido = new Correo(remitente, "Uno", "Cuerpo", [destinatario]);
+    const enviado = new Correo(remitente, "Dos", "Cuerpo", [destinatario]);
+    gestor.recibir(recibido);
+    gestor.enviar(enviado);
+
+    expect(() => gestor.mover(recibido, Bandeja.ENVIADOS)).toThrow();
+    expect(() => gestor.mover(recibido, Bandeja.BORRADORES)).toThrow();
+    expect(() => gestor.mover(enviado, Bandeja.ENTRADA)).toThrow();
+    expect(() => gestor.mover(enviado, Bandeja.BORRADORES)).toThrow();
+    expect(gestor.getBandejaDe(recibido)).toBe(Bandeja.ENTRADA);
+    expect(gestor.getBandejaDe(enviado)).toBe(Bandeja.ENVIADOS);
+  });
+
+  it("rechaza mover un correo a la bandeja en la que ya está", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.recibir(correo);
+
+    expect(() => gestor.mover(correo, Bandeja.ENTRADA)).toThrow();
+  });
+
+  it("un correo eliminado solo sale de Eliminados mediante restaurar", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.recibir(correo);
+    gestor.eliminar(correo);
+
+    expect(() => gestor.mover(correo, Bandeja.ENTRADA)).toThrow();
+    expect(gestor.getBandejaDe(correo)).toBe(Bandeja.ELIMINADOS);
+  });
+
+  it("no permite mover un correo que no está en ninguna bandeja", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+
+    expect(() => gestor.mover(correo, Bandeja.ELIMINADOS)).toThrow();
+  });
+});

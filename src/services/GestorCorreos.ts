@@ -4,6 +4,12 @@ import { ReglaCorreo } from "../funcional/ReglaCorreo";
 
 export class GestorCorreos {
   private static readonly MAX_FILTROS = 5;
+  private static readonly MOVIMIENTOS_PERMITIDOS: Record<Bandeja, Bandeja[]> = {
+    [Bandeja.ENTRADA]: [Bandeja.ELIMINADOS],
+    [Bandeja.ENVIADOS]: [Bandeja.ELIMINADOS],
+    [Bandeja.BORRADORES]: [Bandeja.ENVIADOS, Bandeja.ELIMINADOS],
+    [Bandeja.ELIMINADOS]: [],
+  };
   private filtros: ReglaCorreo[] = [];
   private origenes = new Map<number, Bandeja>();
   private bandejas: Map<Bandeja, Correo[]> = new Map([
@@ -65,6 +71,23 @@ export class GestorCorreos {
     this.bandejas.get(Bandeja.ELIMINADOS)!.push(correo);
   }
 
+  mover(correo: Correo, destino: Bandeja): void {
+    const actual = this.getBandejaDe(correo);
+
+    if (actual === undefined) {
+      throw new Error("El correo no está en ninguna bandeja");
+    }
+    if (!GestorCorreos.MOVIMIENTOS_PERMITIDOS[actual].includes(destino)) {
+      throw new Error(`Movimiento no permitido: de ${actual} a ${destino}`);
+    }
+
+    if (destino === Bandeja.ELIMINADOS) {
+      this.eliminar(correo);
+    } else {
+      this.enviar(correo);
+    }
+  }
+  
   restaurar(correo: Correo): void {
     if (this.getBandejaDe(correo) !== Bandeja.ELIMINADOS) {
       throw new Error("Solo se pueden restaurar correos que están en Eliminados");

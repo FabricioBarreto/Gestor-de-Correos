@@ -30,3 +30,8 @@ export const not =
   (p: Predicado): Predicado =>
   (correo) =>
     !p(correo);
+
+export const cuerpoContiene =
+  (texto: string): Predicado =>
+  (correo) =>
+    correo.getCuerpo().toLowerCase().includes(texto.toLowerCase());

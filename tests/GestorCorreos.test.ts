@@ -339,3 +339,48 @@ describe("GestorCorreos - ubicación de correos", () => {
     expect(gestor.getBandejaDe(correo)).toBeUndefined();
   });
 });
+
+describe("GestorCorreos - una única bandeja por correo", () => {
+  const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+  it("no permite enviar un correo que ya está en la Entrada", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.recibir(correo);
+
+    expect(() => gestor.enviar(correo)).toThrow();
+    expect(gestor.getCorreos(Bandeja.ENVIADOS)).toEqual([]);
+    expect(gestor.getCorreos(Bandeja.ENTRADA)).toEqual([correo]);
+  });
+
+  it("no permite recibir un correo que ya está en Enviados", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.enviar(correo);
+
+    expect(() => gestor.recibir(correo)).toThrow();
+    expect(gestor.getCorreos(Bandeja.ENTRADA)).toEqual([]);
+  });
+
+  it("enviar un borrador válido lo saca de Borradores y lo pasa a Enviados", () => {
+    const gestor = new GestorCorreos();
+    const borrador = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.guardarBorrador(borrador);
+
+    gestor.enviar(borrador);
+
+    expect(gestor.getCorreos(Bandeja.BORRADORES)).toEqual([]);
+    expect(gestor.getCorreos(Bandeja.ENVIADOS)).toEqual([borrador]);
+  });
+
+  it("un borrador inválido no se envía y sigue en Borradores", () => {
+    const gestor = new GestorCorreos();
+    const borrador = new Correo(remitente, "", "Cuerpo", []);
+    gestor.guardarBorrador(borrador);
+
+    expect(() => gestor.enviar(borrador)).toThrow();
+    expect(gestor.getCorreos(Bandeja.BORRADORES)).toEqual([borrador]);
+    expect(gestor.getCorreos(Bandeja.ENVIADOS)).toEqual([]);
+  });
+});

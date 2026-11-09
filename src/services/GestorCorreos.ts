@@ -28,6 +28,10 @@ export class GestorCorreos {
       );
     }
 
+    if (this.getBandejaDe(correo) === Bandeja.BORRADORES) {
+      this.quitar(correo);
+    }
+
     this.agregarSinDuplicar(Bandeja.ENVIADOS, correo);
   }
 
@@ -76,10 +80,26 @@ export class GestorCorreos {
   }
 
   private agregarSinDuplicar(bandeja: Bandeja, correo: Correo): void {
-    const correos = this.bandejas.get(bandeja)!;
-    const yaExiste = correos.some((c) => c.getId() === correo.getId());
-    if (!yaExiste) {
-      correos.push(correo);
+    const actual = this.getBandejaDe(correo);
+
+    if (actual === bandeja) {
+      return;
+    }
+    if (actual !== undefined) {
+      throw new Error(`El correo ya pertenece a la bandeja ${actual}`);
+    }
+
+    this.bandejas.get(bandeja)!.push(correo);
+  }
+
+  private quitar(correo: Correo): void {
+    const actual = this.getBandejaDe(correo);
+
+    if (actual !== undefined) {
+      const restantes = this.bandejas
+        .get(actual)!
+        .filter((c) => c.getId() !== correo.getId());
+      this.bandejas.set(actual, restantes);
     }
   }
 }

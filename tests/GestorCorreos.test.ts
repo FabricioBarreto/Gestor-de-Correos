@@ -5,6 +5,7 @@ import { Correo } from "../src/models/Correo";
 import { Contacto } from "../src/models/Contacto";
 import { Filtro } from "../src/funcional/Filtro";
 import { asuntoContiene } from "../src/funcional/predicados";
+import { filtrosPredefinidos } from "../src/funcional/filtrosPredefinidos";
 
 describe("GestorCorreos", () => {
   it("arranca con todas las bandejas vacías", () => {
@@ -282,5 +283,23 @@ describe("GestorCorreos - filtros", () => {
     expect(() => gestor.aplicarFiltro("Inexistente", Bandeja.ENTRADA)).toThrow(
       "Filtro no encontrado",
     );
+  });
+
+  it("un mismo filtro se aplica sobre distintas bandejas", () => {
+    const gestor = new GestorCorreos();
+    const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const recibido = new Correo(juan, "Examen Final", "Cuerpo", [ana]);
+    const enviado = new Correo(juan, "Examen Parcial", "Cuerpo", [ana]);
+    gestor.recibir(recibido);
+    gestor.enviar(enviado);
+    gestor.registrarFiltro(filtrosPredefinidos.academicosImportantes);
+
+    expect(
+      gestor.aplicarFiltro("Correos académicos importantes", Bandeja.ENTRADA),
+    ).toEqual([recibido]);
+    expect(
+      gestor.aplicarFiltro("Correos académicos importantes", Bandeja.ENVIADOS),
+    ).toEqual([enviado]);
   });
 });

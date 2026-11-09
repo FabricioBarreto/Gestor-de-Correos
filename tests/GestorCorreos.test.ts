@@ -3,6 +3,8 @@ import { GestorCorreos } from "../src/services/GestorCorreos";
 import { Bandeja } from "../src/models/Bandeja";
 import { Correo } from "../src/models/Correo";
 import { Contacto } from "../src/models/Contacto";
+import { Filtro } from "../src/funcional/Filtro";
+import { asuntoContiene } from "../src/funcional/predicados";
 
 describe("GestorCorreos", () => {
   it("arranca con todas las bandejas vacías", () => {
@@ -232,5 +234,30 @@ describe("GestorCorreos - búsqueda con texto vacío y sin efectos", () => {
     expect(correo.getAsunto()).toBe("Examen");
     expect(correo.estaLeido()).toBe(false);
     expect(correo.esFavorito()).toBe(false);
+  });
+});
+
+describe("GestorCorreos - filtros", () => {
+  it("se pueden registrar filtros y consultarlos", () => {
+    const gestor = new GestorCorreos();
+    const filtro = new Filtro("Exámenes", asuntoContiene("examen"));
+    
+    gestor.registrarFiltro(filtro);
+
+    expect(gestor.getFiltros()).toEqual([filtro]);
+  });
+
+  it("no permite registrar más de cinco filtros", () => {
+    const gestor = new GestorCorreos();
+
+    for (let i = 0; i < 5; i++) {
+      const filtro = new Filtro(`Filtro ${i + 1}`, asuntoContiene("test"));
+      gestor.registrarFiltro(filtro);
+    }
+
+    const sextoFiltro = new Filtro("Sexto filtro", asuntoContiene("test"));
+    expect(() => gestor.registrarFiltro(sextoFiltro)).toThrow(
+      "No se pueden registrar más de 5 filtros"
+    );
   });
 });

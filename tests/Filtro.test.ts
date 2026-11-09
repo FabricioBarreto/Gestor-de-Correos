@@ -18,4 +18,30 @@ describe("Filtro", () => {
     expect(filtro.getNombre()).toBe("Exámenes");
     expect(resultado).toEqual([examen]);
   });
+
+  it("cumple evalúa un correo individual", () => {
+    const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+    const examen = new Correo(juan, "Examen Final", "Cuerpo", [ana]);
+    const saludos = new Correo(juan, "Saludos", "Cuerpo", [ana]);
+
+    const filtro = new Filtro("Exámenes", asuntoContiene("examen"));
+
+    expect(filtro.cumple(examen)).toBe(true);
+    expect(filtro.cumple(saludos)).toBe(false);
+  });
+
+  it("aplicar no modifica la colección original", () => {
+    const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const examen = new Correo(juan, "Examen Final", "Cuerpo", [ana]);
+    const saludos = new Correo(juan, "Saludos", "Cuerpo", [ana]);
+    const correos = [examen, saludos];
+    const filtro = new Filtro("Exámenes", asuntoContiene("examen"));
+
+    filtro.aplicar(correos);
+
+    expect(correos).toEqual([examen, saludos]);
+  });
 });

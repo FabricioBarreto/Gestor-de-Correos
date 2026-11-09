@@ -1,7 +1,11 @@
 import { Bandeja } from "../models/Bandeja";
 import { Correo } from "../models/Correo";
+import { ReglaCorreo } from "../funcional/ReglaCorreo";
 
 export class GestorCorreos {
+  private static readonly MAX_FILTROS = 5;
+  private filtros: ReglaCorreo[] = [];
+
   private bandejas: Map<Bandeja, Correo[]> = new Map([
     [Bandeja.ENTRADA, []],
     [Bandeja.ENVIADOS, []],
@@ -11,6 +15,10 @@ export class GestorCorreos {
 
   getCorreos(bandeja: Bandeja): Correo[] {
     return [...(this.bandejas.get(bandeja) ?? [])];
+  }
+
+  getFiltros(): ReglaCorreo[] {
+    return [...this.filtros];
   }
 
   enviar(correo: Correo): void {
@@ -37,6 +45,13 @@ export class GestorCorreos {
     return this.getCorreos(Bandeja.ENTRADA).filter((correo) =>
       correo.coincideCon(buscado),
     );
+  }
+
+  registrarFiltro(regla: ReglaCorreo): void {
+    if (this.filtros.length >= GestorCorreos.MAX_FILTROS) {
+      throw new Error("No se pueden registrar más de 5 filtros");
+    }
+    this.filtros.push(regla);
   }
 
   private agregarSinDuplicar(bandeja: Bandeja, correo: Correo): void {

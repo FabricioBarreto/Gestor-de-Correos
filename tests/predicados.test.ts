@@ -9,6 +9,7 @@ import {
   and,
   or,
   not,
+  cuerpoContiene,
 } from "../src/funcional/predicados";
 
 describe("Predicados", () => {
@@ -95,5 +96,22 @@ describe("Predicados", () => {
 
     expect(sinSaludos(saludos)).toBe(false);
     expect(sinSaludos(examen)).toBe(true);
+  });
+
+  it("cuerpoContiene identifica correos cuyo contenido incluye el texto", () => {
+    const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const conEntrega = new Correo(
+      juan,
+      "Asunto",
+      "Recuerden la Entrega del viernes",
+      [ana],
+    );
+    const saludo = new Correo(juan, "Asunto", "Hola", [ana]);
+
+    const deEntrega = cuerpoContiene("entrega");
+
+    expect(deEntrega(conEntrega)).toBe(true);
+    expect(deEntrega(saludo)).toBe(false);
   });
 });

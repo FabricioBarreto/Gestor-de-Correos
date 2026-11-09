@@ -442,3 +442,62 @@ describe("GestorCorreos - eliminación lógica", () => {
     expect(gestor.getCorreos(Bandeja.ELIMINADOS)).toHaveLength(1);
   });
 });
+
+describe("GestorCorreos - restauración", () => {
+  const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+  it("un correo eliminado se restaura a la bandeja de origen", () => {
+    const gestor = new GestorCorreos();
+    const recibido = new Correo(remitente, "Uno", "Cuerpo", [destinatario]);
+    const enviado = new Correo(remitente, "Dos", "Cuerpo", [destinatario]);
+    const borrador = new Correo(remitente, "Tres", "Cuerpo", []);
+    gestor.recibir(recibido);
+    gestor.enviar(enviado);
+    gestor.guardarBorrador(borrador);
+    gestor.eliminar(recibido);
+    gestor.eliminar(enviado);
+    gestor.eliminar(borrador);
+
+    gestor.restaurar(recibido);
+    gestor.restaurar(enviado);
+    gestor.restaurar(borrador);
+
+    expect(gestor.getBandejaDe(recibido)).toBe(Bandeja.ENTRADA);
+    expect(gestor.getBandejaDe(enviado)).toBe(Bandeja.ENVIADOS);
+    expect(gestor.getBandejaDe(borrador)).toBe(Bandeja.BORRADORES);
+    expect(gestor.getCorreos(Bandeja.ELIMINADOS)).toEqual([]);
+  });
+
+  it("restaurar no genera duplicados", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.recibir(correo);
+    gestor.eliminar(correo);
+
+    gestor.restaurar(correo);
+
+    expect(gestor.getCorreos(Bandeja.ENTRADA)).toHaveLength(1);
+  });
+
+  it("un correo se puede eliminar y restaurar más de una vez", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.recibir(correo);
+
+    gestor.eliminar(correo);
+    gestor.restaurar(correo);
+    gestor.eliminar(correo);
+    gestor.restaurar(correo);
+
+    expect(gestor.getBandejaDe(correo)).toBe(Bandeja.ENTRADA);
+  });
+
+  it("no permite restaurar un correo que no está en Eliminados", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.recibir(correo);
+
+    expect(() => gestor.restaurar(correo)).toThrow();
+  });
+});

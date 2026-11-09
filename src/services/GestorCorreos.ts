@@ -65,6 +65,18 @@ export class GestorCorreos {
     this.bandejas.get(Bandeja.ELIMINADOS)!.push(correo);
   }
 
+  restaurar(correo: Correo): void {
+    if (this.getBandejaDe(correo) !== Bandeja.ELIMINADOS) {
+      throw new Error("Solo se pueden restaurar correos que están en Eliminados");
+    }
+
+    const origen = this.origenes.get(correo.getId())!;
+
+    this.quitar(correo);
+    this.origenes.delete(correo.getId());
+    this.bandejas.get(origen)!.push(correo);
+  }
+
   buscar(texto: string): Correo[] {
     const buscado = texto.trim();
 

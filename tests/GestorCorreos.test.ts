@@ -303,3 +303,39 @@ describe("GestorCorreos - filtros", () => {
     ).toEqual([enviado]);
   });
 });
+
+describe("GestorCorreos - ubicación de correos", () => {
+  const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+  it("un correo guardado como borrador queda en Borradores", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "", "", []);
+
+    gestor.guardarBorrador(correo);
+
+    expect(gestor.getCorreos(Bandeja.BORRADORES)).toEqual([correo]);
+  });
+
+  it("indica en qué bandeja está cada correo", () => {
+    const gestor = new GestorCorreos();
+    const recibido = new Correo(remitente, "Uno", "Cuerpo", [destinatario]);
+    const enviado = new Correo(remitente, "Dos", "Cuerpo", [destinatario]);
+    const borrador = new Correo(remitente, "Tres", "Cuerpo", []);
+
+    gestor.recibir(recibido);
+    gestor.enviar(enviado);
+    gestor.guardarBorrador(borrador);
+
+    expect(gestor.getBandejaDe(recibido)).toBe(Bandeja.ENTRADA);
+    expect(gestor.getBandejaDe(enviado)).toBe(Bandeja.ENVIADOS);
+    expect(gestor.getBandejaDe(borrador)).toBe(Bandeja.BORRADORES);
+  });
+
+  it("un correo que no está en ninguna bandeja no tiene ubicación", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+
+    expect(gestor.getBandejaDe(correo)).toBeUndefined();
+  });
+});

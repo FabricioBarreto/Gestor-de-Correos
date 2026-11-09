@@ -34,7 +34,18 @@ export class GestorCorreos {
   recibir(correo: Correo): void {
     this.agregarSinDuplicar(Bandeja.ENTRADA, correo);
   }
+  
+  guardarBorrador(correo: Correo): void {
+    this.agregarSinDuplicar(Bandeja.BORRADORES, correo);
+  }
 
+  getBandejaDe(correo: Correo): Bandeja | undefined {
+    const ubicacion = [...this.bandejas.entries()].find(([, correos]) =>
+      correos.some((c) => c.getId() === correo.getId()),
+    );
+    return ubicacion?.[0];
+  }
+  
   buscar(texto: string): Correo[] {
     const buscado = texto.trim();
 

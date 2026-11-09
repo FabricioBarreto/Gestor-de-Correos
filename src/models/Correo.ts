@@ -36,13 +36,16 @@ export class Correo {
     return [...this.destinatarios];
   }
 
-
   setAsunto(asunto: string): void {
     this.asunto = asunto;
   }
 
   setCuerpo(cuerpo: string): void {
     this.cuerpo = cuerpo;
+  }
+
+  setDestinatarios(destinatarios: Contacto[]): void {
+    this.destinatarios = [...destinatarios];
   }
 
   estaLeido(): boolean {

@@ -56,6 +56,15 @@ export class Correo {
     return this.favorito;
   }
 
+  copiar(): Correo {
+    return new Correo(
+      this.remitente,
+      this.asunto,
+      this.cuerpo,
+      this.destinatarios,
+    );
+  }
+  
   puedeEnviarse(): boolean {
     return (
       this.remitente !== undefined &&

@@ -613,3 +613,49 @@ describe("GestorCorreos - edición de borradores", () => {
     );
   });
 });
+
+describe("GestorCorreos - entrega al enviar", () => {
+  const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+  it("al enviar un correo se invoca la función de entrega", () => {
+    const entregados: Correo[] = [];
+    const gestor = new GestorCorreos((c) => entregados.push(c));
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+
+    gestor.enviar(correo);
+
+    expect(entregados).toEqual([correo]);
+  });
+
+  it("enviar dos veces el mismo correo lo entrega una sola vez", () => {
+    const entregados: Correo[] = [];
+    const gestor = new GestorCorreos((c) => entregados.push(c));
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+
+    gestor.enviar(correo);
+    gestor.enviar(correo);
+
+    expect(entregados).toHaveLength(1);
+  });
+
+  it("un correo inválido no se entrega", () => {
+    const entregados: Correo[] = [];
+    const gestor = new GestorCorreos((c) => entregados.push(c));
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", []);
+
+    expect(() => gestor.enviar(correo)).toThrow();
+    expect(entregados).toEqual([]);
+  });
+
+  it("mover un borrador a Enviados también lo entrega", () => {
+    const entregados: Correo[] = [];
+    const gestor = new GestorCorreos((c) => entregados.push(c));
+    const borrador = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.guardarBorrador(borrador);
+
+    gestor.mover(borrador, Bandeja.ENVIADOS);
+
+    expect(entregados).toEqual([borrador]);
+  });
+});

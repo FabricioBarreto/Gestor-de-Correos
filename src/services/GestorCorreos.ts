@@ -19,6 +19,7 @@ export class GestorCorreos {
     [Bandeja.BORRADORES, []],
     [Bandeja.ELIMINADOS, []],
   ]);
+  constructor(private readonly entrega?: (correo: Correo) => void) {}
 
   getCorreos(bandeja: Bandeja): Correo[] {
     return [...(this.bandejas.get(bandeja) ?? [])];
@@ -35,11 +36,17 @@ export class GestorCorreos {
       );
     }
 
+    const yaEnviado = this.getBandejaDe(correo) === Bandeja.ENVIADOS;
+
     if (this.getBandejaDe(correo) === Bandeja.BORRADORES) {
       this.quitar(correo);
     }
 
     this.agregarSinDuplicar(Bandeja.ENVIADOS, correo);
+
+    if (!yaEnviado) {
+      this.entrega?.(correo);
+    }
   }
 
   recibir(correo: Correo): void {

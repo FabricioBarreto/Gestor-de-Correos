@@ -32,4 +32,16 @@ describe("Estadísticas", () => {
     expect(resultado).toEqual([examen]);
     expect(correos).toEqual([examen, saludos]); // no modifica la original
   });
+
+  it("contarNoLeidos cuenta los correos sin leer con reduce", () => {
+    const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const uno = new Correo(juan, "Uno", "Cuerpo", [ana]);
+    const dos = new Correo(juan, "Dos", "Cuerpo", [ana]);
+    const tres = new Correo(juan, "Tres", "Cuerpo", [ana]);
+    dos.marcarComoLeido();
+
+    expect(contarNoLeidos([uno, dos, tres])).toBe(2);
+    expect(contarNoLeidos([])).toBe(0);
+  });
 });

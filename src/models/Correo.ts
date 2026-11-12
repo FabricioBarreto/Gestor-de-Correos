@@ -51,13 +51,21 @@ export class Correo {
   estaLeido(): boolean {
     return this.leido;
   }
- 
+
   marcarComoLeido(): void {
     this.leido = true;
   }
 
   marcarComoNoLeido(): void {
     this.leido = false;
+  }
+
+  marcarComoFavorito(): void {
+    this.favorito = true;
+  }
+
+  desmarcarComoFavorito(): void {
+    this.favorito = false;
   }
 
   esFavorito(): boolean {

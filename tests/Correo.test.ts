@@ -84,18 +84,29 @@ describe("Correo", () => {
     expect(correo.getCuerpo()).toBe("Texto corregido");
   });
 
-it("permite reemplazar los destinatarios sin exponer el array", () => {
-  const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
-  const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
-  const luis = new Contacto("Luis Gómez", "luis@gmail.com");
-  const marta = new Contacto("Marta Ruiz", "marta@hotmail.com");
-  const correo = new Correo(remitente, "Asunto", "Cuerpo", [ana]);
-  const nuevos = [luis];
+  it("permite reemplazar los destinatarios sin exponer el array", () => {
+    const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const luis = new Contacto("Luis Gómez", "luis@gmail.com");
+    const marta = new Contacto("Marta Ruiz", "marta@hotmail.com");
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [ana]);
+    const nuevos = [luis];
 
-  correo.setDestinatarios(nuevos);
-  nuevos.push(marta);
+    correo.setDestinatarios(nuevos);
+    nuevos.push(marta);
 
-  expect(correo.getDestinatarios()).toEqual([luis]);
-});
+    expect(correo.getDestinatarios()).toEqual([luis]);
+  });
 
+  it("se puede marcar y desmarcar como favorito", () => {
+    const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+
+    correo.marcarComoFavorito();
+    expect(correo.esFavorito()).toBe(true);
+
+    correo.desmarcarComoFavorito();
+    expect(correo.esFavorito()).toBe(false);
+  });
 });

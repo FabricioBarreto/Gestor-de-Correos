@@ -582,23 +582,19 @@ describe("GestorCorreos - edición de borradores", () => {
   const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
 
   it("editar un borrador conserva los cambios y luego se puede enviar", () => {
-    // Arrange: un borrador incompleto
     const gestor = new GestorCorreos();
     const correo = new Correo(juan, "", "Cuerpo", []);
     gestor.guardarBorrador(correo);
 
-    // Act
     gestor.editarBorrador(correo, {
       asunto: "Examen Final",
       destinatarios: [ana],
     });
 
-    // Assert: los cambios quedaron y sigue en Borradores
     expect(correo.getAsunto()).toBe("Examen Final");
     expect(correo.getDestinatarios()).toEqual([ana]);
     expect(gestor.getBandejaDe(correo)).toBe(Bandeja.BORRADORES);
 
-    // y ahora que está completo, se puede enviar
     gestor.enviar(correo);
     expect(gestor.getBandejaDe(correo)).toBe(Bandeja.ENVIADOS);
   });

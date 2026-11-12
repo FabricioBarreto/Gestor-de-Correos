@@ -1,7 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { Correo } from "../src/models/Correo";
 import { Contacto } from "../src/models/Contacto";
-import { asuntos } from "../src/funcional/estadisticas";
+import { asuntos, filtrarPor } from "../src/funcional/estadisticas";
+import { asuntoContiene } from "../src/funcional/predicados";
 
 describe("Estadísticas", () => {
   it("asuntos devuelve la lista de asuntos de una colección", () => {

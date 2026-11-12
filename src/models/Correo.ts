@@ -51,6 +51,14 @@ export class Correo {
   estaLeido(): boolean {
     return this.leido;
   }
+ 
+  marcarComoLeido(): void {
+    this.leido = true;
+  }
+
+  marcarComoNoLeido(): void {
+    this.leido = false;
+  }
 
   esFavorito(): boolean {
     return this.favorito;
@@ -64,7 +72,7 @@ export class Correo {
       this.destinatarios,
     );
   }
-  
+
   puedeEnviarse(): boolean {
     return (
       this.remitente !== undefined &&

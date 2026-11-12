@@ -3,6 +3,7 @@ import { Correo } from "../src/models/Correo";
 import { Contacto } from "../src/models/Contacto";
 import {
   asuntos,
+  cantidadPorRemitente,
   contarNoLeidos,
   filtrarPor,
 } from "../src/funcional/estadisticas";

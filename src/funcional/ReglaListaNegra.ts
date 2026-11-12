@@ -1,18 +1,12 @@
 import { Correo } from "../models/Correo";
-import { ReglaCorreo } from "./ReglaCorreo";
+import { ReglaBase } from "./ReglaBase";
 
-export class ReglaListaNegra implements ReglaCorreo {
+export class ReglaListaNegra extends ReglaBase {
   private bloqueados: string[];
 
-  constructor(
-    private nombre: string,
-    emails: string[],
-  ) {
+  constructor(nombre: string, emails: string[]) {
+    super(nombre);
     this.bloqueados = emails.map((e) => e.toLowerCase());
-  }
-
-  getNombre(): string {
-    return this.nombre;
   }
 
   cumple(correo: Correo): boolean {

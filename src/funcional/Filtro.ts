@@ -1,15 +1,10 @@
 import { Correo } from "../models/Correo";
 import { Predicado } from "./predicados";
-import { ReglaCorreo } from "./ReglaCorreo";
+import { ReglaBase } from "./ReglaBase";
 
-export class Filtro implements ReglaCorreo {
-  constructor(
-    private nombre: string,
-    private predicado: Predicado,
-  ) {}
-
-  getNombre(): string {
-    return this.nombre;
+export class Filtro extends ReglaBase {
+  constructor(nombre: string, private predicado: Predicado) {
+    super(nombre);
   }
 
   aplicar(correos: Correo[]): Correo[] {

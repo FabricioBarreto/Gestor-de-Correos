@@ -1,0 +1,21 @@
+import { describe, it, expect } from "vitest";
+import { Correo } from "../src/models/Correo";
+import { Contacto } from "../src/models/Contacto";
+import { asuntos } from "../src/funcional/estadisticas";
+
+describe("Estadísticas", () => {
+  it("asuntos devuelve la lista de asuntos de una colección", () => {
+    const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const examen = new Correo(juan, "Examen Final", "Cuerpo", [ana]);
+    const saludos = new Correo(juan, "Saludos", "Cuerpo", [ana]);
+
+    const resultado = asuntos([examen, saludos]);
+
+    expect(resultado).toEqual(["Examen Final", "Saludos"]);
+  });
+
+  it("asuntos de una colección vacía es una lista vacía", () => {
+    expect(asuntos([])).toEqual([]);
+  });
+});

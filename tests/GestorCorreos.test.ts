@@ -749,7 +749,7 @@ describe("GestorCorreos - favoritos", () => {
 
     gestor.eliminar(correo);
     expect(gestor.getFavoritos()).toEqual([]);
-    expect(correo.esFavorito()).toBe(true); // conserva el indicador
+    expect(correo.esFavorito()).toBe(true);
 
     gestor.restaurar(correo);
     expect(gestor.getFavoritos()).toEqual([correo]);

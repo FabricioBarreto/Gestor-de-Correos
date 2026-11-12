@@ -659,3 +659,56 @@ describe("GestorCorreos - entrega al enviar", () => {
     expect(entregados).toEqual([borrador]);
   });
 });
+
+describe("GestorCorreos - correos no leídos", () => {
+  const remitente = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const destinatario = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+  it("devuelve solo los correos no leídos de la bandeja", () => {
+    const gestor = new GestorCorreos();
+    const leido = new Correo(remitente, "Uno", "Cuerpo", [destinatario]);
+    const noLeido = new Correo(remitente, "Dos", "Cuerpo", [destinatario]);
+    gestor.recibir(leido);
+    gestor.recibir(noLeido);
+    leido.marcarComoLeido();
+
+    expect(gestor.getNoLeidos(Bandeja.ENTRADA)).toEqual([noLeido]);
+  });
+
+  it("marcar como leído un correo lo saca del resultado inmediatamente", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.recibir(correo);
+    expect(gestor.getNoLeidos(Bandeja.ENTRADA)).toEqual([correo]);
+
+    correo.marcarComoLeido();
+
+    expect(gestor.getNoLeidos(Bandeja.ENTRADA)).toEqual([]);
+  });
+
+  it("marcar como no leído un correo lo vuelve a incluir", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(remitente, "Asunto", "Cuerpo", [destinatario]);
+    gestor.recibir(correo);
+    correo.marcarComoLeido();
+
+    correo.marcarComoNoLeido();
+
+    expect(gestor.getNoLeidos(Bandeja.ENTRADA)).toEqual([correo]);
+  });
+
+  it("devuelve una colección vacía si la bandeja está vacía", () => {
+    const gestor = new GestorCorreos();
+
+    expect(gestor.getNoLeidos(Bandeja.ENTRADA)).toEqual([]);
+  });
+
+  it("solo considera los correos de la bandeja pedida", () => {
+    const gestor = new GestorCorreos();
+    gestor.recibir(new Correo(remitente, "Uno", "Cuerpo", [destinatario]));
+    const enviado = new Correo(remitente, "Dos", "Cuerpo", [destinatario]);
+    gestor.enviar(enviado);
+
+    expect(gestor.getNoLeidos(Bandeja.ENVIADOS)).toEqual([enviado]);
+  });
+});

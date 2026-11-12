@@ -1,6 +1,7 @@
 import { Bandeja } from "../models/Bandeja";
 import { Correo } from "../models/Correo";
 import { ReglaCorreo } from "../funcional/ReglaCorreo";
+import { noLeido } from "../funcional/predicados";
 import { Contacto } from "../models/Contacto";
 
 export class GestorCorreos {
@@ -20,6 +21,10 @@ export class GestorCorreos {
     [Bandeja.ELIMINADOS, []],
   ]);
   constructor(private readonly entrega?: (correo: Correo) => void) {}
+
+  getNoLeidos(bandeja: Bandeja): Correo[] {
+    return this.getCorreos(bandeja).filter(noLeido);
+  }
 
   getCorreos(bandeja: Bandeja): Correo[] {
     return [...(this.bandejas.get(bandeja) ?? [])];

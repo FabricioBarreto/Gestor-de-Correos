@@ -1,7 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { Correo } from "../src/models/Correo";
 import { Contacto } from "../src/models/Contacto";
-import { asuntos, contarNoLeidos, filtrarPor } from "../src/funcional/estadisticas";
+import {
+  asuntos,
+  contarNoLeidos,
+  filtrarPor,
+} from "../src/funcional/estadisticas";
 import { asuntoContiene } from "../src/funcional/predicados";
 
 describe("Estadísticas", () => {
@@ -30,7 +34,7 @@ describe("Estadísticas", () => {
     const resultado = filtrarPor(correos, asuntoContiene("examen"));
 
     expect(resultado).toEqual([examen]);
-    expect(correos).toEqual([examen, saludos]); 
+    expect(correos).toEqual([examen, saludos]);
   });
 
   it("contarNoLeidos cuenta los correos sin leer con reduce", () => {
@@ -43,5 +47,22 @@ describe("Estadísticas", () => {
 
     expect(contarNoLeidos([uno, dos, tres])).toBe(2);
     expect(contarNoLeidos([])).toBe(0);
+  });
+
+  it("cantidadPorRemitente agrupa los correos por remitente con reduce", () => {
+    const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const luis = new Contacto("Luis Gómez", "luis@gmail.com");
+    const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const correos = [
+      new Correo(juan, "Uno", "Cuerpo", [ana]),
+      new Correo(luis, "Dos", "Cuerpo", [ana]),
+      new Correo(juan, "Tres", "Cuerpo", [ana]),
+    ];
+
+    expect(cantidadPorRemitente(correos)).toEqual({
+      "juan@ucp.edu.ar": 2,
+      "luis@gmail.com": 1,
+    });
+    expect(cantidadPorRemitente([])).toEqual({});
   });
 });

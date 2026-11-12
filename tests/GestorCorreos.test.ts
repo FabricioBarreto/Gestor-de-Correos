@@ -708,3 +708,50 @@ describe("GestorCorreos - correos no leídos", () => {
     expect(gestor.getNoLeidos(Bandeja.ENVIADOS)).toEqual([enviado]);
   });
 });
+
+describe("GestorCorreos - favoritos", () => {
+  const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+
+  it("muestra los favoritos de todas las bandejas", () => {
+    const gestor = new GestorCorreos();
+    const recibido = new Correo(juan, "Uno", "Cuerpo", [ana]);
+    const enviado = new Correo(juan, "Dos", "Cuerpo", [ana]);
+    const borrador = new Correo(juan, "Tres", "Cuerpo", []);
+    gestor.recibir(recibido);
+    gestor.enviar(enviado);
+    gestor.guardarBorrador(borrador);
+
+    recibido.marcarComoFavorito();
+    enviado.marcarComoFavorito();
+
+    const favoritos = gestor.getFavoritos();
+    expect(favoritos).toHaveLength(2);
+    expect(favoritos).toContain(recibido);
+    expect(favoritos).toContain(enviado);
+  });
+
+  it("marcar como favorito no mueve el correo de su bandeja", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(juan, "Asunto", "Cuerpo", [ana]);
+    gestor.recibir(correo);
+
+    correo.marcarComoFavorito();
+
+    expect(gestor.getBandejaDe(correo)).toBe(Bandeja.ENTRADA);
+  });
+
+  it("los eliminados no aparecen en favoritos y vuelven al restaurarse", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(juan, "Asunto", "Cuerpo", [ana]);
+    gestor.recibir(correo);
+    correo.marcarComoFavorito();
+
+    gestor.eliminar(correo);
+    expect(gestor.getFavoritos()).toEqual([]);
+    expect(correo.esFavorito()).toBe(true); // conserva el indicador
+
+    gestor.restaurar(correo);
+    expect(gestor.getFavoritos()).toEqual([correo]);
+  });
+});

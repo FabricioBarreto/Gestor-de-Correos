@@ -754,4 +754,31 @@ describe("GestorCorreos - favoritos", () => {
     gestor.restaurar(correo);
     expect(gestor.getFavoritos()).toEqual([correo]);
   });
+
+  it("no hay duplicados al consultar favoritos", () => {
+    const gestor = new GestorCorreos();
+    const correo = new Correo(juan, "Asunto", "Cuerpo", [ana]);
+    gestor.recibir(correo);
+    correo.marcarComoFavorito();
+    correo.marcarComoFavorito();
+
+    expect(gestor.getFavoritos()).toEqual([correo]);
+  });
+
+  it("se pueden combinar filtros sobre la colección de favoritos", () => {
+    const gestor = new GestorCorreos();
+    const luis = new Contacto("Luis Gómez", "luis@gmail.com");
+    const academico = new Correo(juan, "Examen Final", "Cuerpo", [ana]);
+    const personal = new Correo(luis, "Examen de manejo", "Cuerpo", [ana]);
+    gestor.recibir(academico);
+    gestor.recibir(personal);
+    academico.marcarComoFavorito();
+    personal.marcarComoFavorito();
+
+    const resultado = filtrosPredefinidos.academicosImportantes.aplicar(
+      gestor.getFavoritos(),
+    );
+
+    expect(resultado).toEqual([academico]);
+  });
 });

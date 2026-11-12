@@ -115,3 +115,76 @@ describe("ServidorCorreo - entrega de correos", () => {
     expect(buzonAna.getCorreos(Bandeja.ENTRADA)).toHaveLength(1);
   });
 });
+
+describe("ServidorCorreo - independencia entre usuarios", () => {
+  const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+  const luis = new Contacto("Luis Gómez", "luis@ucp.edu.ar");
+
+  function escenario() {
+    const servidor = new ServidorCorreo();
+    const buzonJuan = servidor.registrarUsuario(juan);
+    const buzonAna = servidor.registrarUsuario(ana);
+    const buzonLuis = servidor.registrarUsuario(luis);
+    const correo = new Correo(juan, "Asunto", "Cuerpo", [ana, luis]);
+    buzonJuan.enviar(correo);
+    return { buzonJuan, buzonAna, buzonLuis, correo };
+  }
+
+  it("eliminar en un usuario no afecta a los demás", () => {
+    const { buzonJuan, buzonAna, buzonLuis } = escenario();
+    const deAna = buzonAna.getCorreos(Bandeja.ENTRADA)[0];
+
+    buzonAna.eliminar(deAna);
+
+    expect(buzonAna.getCorreos(Bandeja.ENTRADA)).toEqual([]);
+    expect(buzonAna.getCorreos(Bandeja.ELIMINADOS)).toHaveLength(1);
+    expect(buzonLuis.getCorreos(Bandeja.ENTRADA)).toHaveLength(1);
+    expect(buzonLuis.getCorreos(Bandeja.ELIMINADOS)).toEqual([]);
+    expect(buzonJuan.getCorreos(Bandeja.ENVIADOS)).toHaveLength(1);
+  });
+
+  it("restaurar en un usuario no afecta a los demás", () => {
+    const { buzonAna, buzonLuis } = escenario();
+    const deAna = buzonAna.getCorreos(Bandeja.ENTRADA)[0];
+    const deLuis = buzonLuis.getCorreos(Bandeja.ENTRADA)[0];
+    buzonAna.eliminar(deAna);
+    buzonLuis.eliminar(deLuis);
+
+    buzonAna.restaurar(deAna);
+
+    expect(buzonAna.getCorreos(Bandeja.ENTRADA)).toHaveLength(1);
+    expect(buzonLuis.getCorreos(Bandeja.ENTRADA)).toEqual([]);
+    expect(buzonLuis.getCorreos(Bandeja.ELIMINADOS)).toHaveLength(1);
+  });
+
+  it("enviar dos veces el mismo correo no duplica la entrega", () => {
+    const { buzonJuan, buzonAna, correo } = escenario();
+
+    buzonJuan.enviar(correo);
+
+    expect(buzonJuan.getCorreos(Bandeja.ENVIADOS)).toHaveLength(1);
+    expect(buzonAna.getCorreos(Bandeja.ENTRADA)).toHaveLength(1);
+  });
+
+  it("enviar un borrador lo entrega y lo saca de Borradores del remitente", () => {
+    const servidor = new ServidorCorreo();
+    const buzonJuan = servidor.registrarUsuario(juan);
+    const buzonAna = servidor.registrarUsuario(ana);
+    const borrador = new Correo(juan, "Asunto", "Cuerpo", [ana]);
+    buzonJuan.guardarBorrador(borrador);
+
+    buzonJuan.enviar(borrador);
+
+    expect(buzonJuan.getCorreos(Bandeja.BORRADORES)).toEqual([]);
+    expect(buzonJuan.getCorreos(Bandeja.ENVIADOS)).toEqual([borrador]);
+    expect(buzonAna.getCorreos(Bandeja.ENTRADA)).toHaveLength(1);
+  });
+
+  it("la búsqueda de un usuario solo mira su propia Entrada", () => {
+    const { buzonJuan, buzonAna } = escenario();
+
+    expect(buzonAna.buscar("Asunto")).toHaveLength(1);
+    expect(buzonJuan.buscar("Asunto")).toEqual([]);
+  });
+});

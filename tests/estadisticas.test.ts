@@ -18,4 +18,17 @@ describe("Estadísticas", () => {
   it("asuntos de una colección vacía es una lista vacía", () => {
     expect(asuntos([])).toEqual([]);
   });
+
+  it("filtrarPor devuelve los correos que cumplen un predicado", () => {
+    const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+    const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+    const examen = new Correo(juan, "Examen Final", "Cuerpo", [ana]);
+    const saludos = new Correo(juan, "Saludos", "Cuerpo", [ana]);
+    const correos = [examen, saludos];
+
+    const resultado = filtrarPor(correos, asuntoContiene("examen"));
+
+    expect(resultado).toEqual([examen]);
+    expect(correos).toEqual([examen, saludos]); // no modifica la original
+  });
 });

@@ -1,7 +1,7 @@
 import { Bandeja } from "../models/Bandeja";
 import { Correo } from "../models/Correo";
 import { ReglaCorreo } from "../funcional/ReglaCorreo";
-import { noLeido } from "../funcional/predicados";
+import { favorito, noLeido } from "../funcional/predicados";
 import { Contacto } from "../models/Contacto";
 
 export class GestorCorreos {
@@ -24,6 +24,12 @@ export class GestorCorreos {
 
   getNoLeidos(bandeja: Bandeja): Correo[] {
     return this.getCorreos(bandeja).filter(noLeido);
+  }
+
+  getFavoritos(): Correo[] {
+    return [Bandeja.ENTRADA, Bandeja.ENVIADOS, Bandeja.BORRADORES]
+      .flatMap((b) => this.getCorreos(b))
+      .filter(favorito);
   }
 
   getCorreos(bandeja: Bandeja): Correo[] {

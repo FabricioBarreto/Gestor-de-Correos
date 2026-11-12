@@ -56,3 +56,62 @@ describe("ServidorCorreo - buzones por usuario", () => {
     expect(() => servidor.getBuzon("nadie@ucp.edu.ar")).toThrow();
   });
 });
+
+describe("ServidorCorreo - entrega de correos", () => {
+  const juan = new Contacto("Juan García", "juan@ucp.edu.ar");
+  const ana = new Contacto("Ana Pérez", "ana@ucp.edu.ar");
+  const luis = new Contacto("Luis Gómez", "luis@ucp.edu.ar");
+
+  it("enviar guarda el correo en los Enviados del remitente", () => {
+    const servidor = new ServidorCorreo();
+    const buzonJuan = servidor.registrarUsuario(juan);
+    servidor.registrarUsuario(ana);
+    const correo = new Correo(juan, "Asunto", "Cuerpo", [ana]);
+
+    buzonJuan.enviar(correo);
+
+    expect(buzonJuan.getCorreos(Bandeja.ENVIADOS)).toEqual([correo]);
+  });
+
+  it("enviar entrega una copia en la Entrada de cada destinatario", () => {
+    const servidor = new ServidorCorreo();
+    const buzonJuan = servidor.registrarUsuario(juan);
+    const buzonAna = servidor.registrarUsuario(ana);
+    const buzonLuis = servidor.registrarUsuario(luis);
+    const correo = new Correo(juan, "Examen", "Cuerpo", [ana, luis]);
+
+    buzonJuan.enviar(correo);
+
+    const deAna = buzonAna.getCorreos(Bandeja.ENTRADA);
+    const deLuis = buzonLuis.getCorreos(Bandeja.ENTRADA);
+    expect(deAna).toHaveLength(1);
+    expect(deLuis).toHaveLength(1);
+    expect(deAna[0].getAsunto()).toBe("Examen");
+    expect(deAna[0].getRemitente()).toBe(juan);
+    expect(deAna[0]).not.toBe(deLuis[0]);
+    expect(deAna[0]).not.toBe(correo);
+  });
+
+  it("el remitente no recibe el correo en su Entrada", () => {
+    const servidor = new ServidorCorreo();
+    const buzonJuan = servidor.registrarUsuario(juan);
+    servidor.registrarUsuario(ana);
+
+    buzonJuan.enviar(new Correo(juan, "Asunto", "Cuerpo", [ana]));
+
+    expect(buzonJuan.getCorreos(Bandeja.ENTRADA)).toEqual([]);
+  });
+
+  it("los destinatarios sin buzón se ignoran (correos externos)", () => {
+    const servidor = new ServidorCorreo();
+    const buzonJuan = servidor.registrarUsuario(juan);
+    const buzonAna = servidor.registrarUsuario(ana);
+    const externo = new Contacto("Externo", "externo@gmail.com");
+    const correo = new Correo(juan, "Asunto", "Cuerpo", [externo, ana]);
+
+    buzonJuan.enviar(correo);
+
+    expect(buzonJuan.getCorreos(Bandeja.ENVIADOS)).toEqual([correo]);
+    expect(buzonAna.getCorreos(Bandeja.ENTRADA)).toHaveLength(1);
+  });
+});

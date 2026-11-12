@@ -1,4 +1,5 @@
 import { Contacto } from "../models/Contacto";
+import { Correo } from "../models/Correo";
 import { GestorCorreos } from "./GestorCorreos";
 
 export class ServidorCorreo {
@@ -11,7 +12,7 @@ export class ServidorCorreo {
       throw new Error("Ya existe un usuario con ese email");
     }
 
-    const buzon = new GestorCorreos();
+    const buzon = new GestorCorreos((correo) => this.entregar(correo));
     this.buzones.set(clave, buzon);
     return buzon;
   }
@@ -24,6 +25,15 @@ export class ServidorCorreo {
     }
 
     return buzon;
+  }
+
+    private entregar(correo: Correo): void {
+    correo.getDestinatarios().forEach((destinatario) => {
+      const buzon = this.buzones.get(
+        ServidorCorreo.clave(destinatario.getEmail()),
+      );
+      buzon?.recibir(correo.copiar());
+    });
   }
 
   private static clave(email: string): string {

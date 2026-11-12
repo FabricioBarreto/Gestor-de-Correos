@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { Correo } from "../src/models/Correo";
 import { Contacto } from "../src/models/Contacto";
-import { asuntos, filtrarPor } from "../src/funcional/estadisticas";
+import { asuntos, contarNoLeidos, filtrarPor } from "../src/funcional/estadisticas";
 import { asuntoContiene } from "../src/funcional/predicados";
 
 describe("Estadísticas", () => {
@@ -30,7 +30,7 @@ describe("Estadísticas", () => {
     const resultado = filtrarPor(correos, asuntoContiene("examen"));
 
     expect(resultado).toEqual([examen]);
-    expect(correos).toEqual([examen, saludos]); // no modifica la original
+    expect(correos).toEqual([examen, saludos]); 
   });
 
   it("contarNoLeidos cuenta los correos sin leer con reduce", () => {
